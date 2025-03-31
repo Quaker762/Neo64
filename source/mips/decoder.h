@@ -411,18 +411,19 @@ enum CacheOp {
 };
 
 // I-type
+#pragma pack(push, 1)
 struct ImmediateInstruction {
-  OpCode op : 6;
-  uint8_t rs : 5;
-  uint8_t rt : 5;
   uint16_t immediate : 16;
-};
+  uint8_t rt : 5;
+  uint8_t rs : 5;
+  OpCode op : 6;
+} __attribute__((aligned(4)));
 
 // J-type
 struct JumpInstruction {
   OpCode op : 6;
   uint32_t target : 26;
-};
+} __attribute__((aligned(4)));
 
 // R-type
 struct RegisterInstruction {
@@ -432,7 +433,7 @@ struct RegisterInstruction {
   uint8_t rd : 5;
   uint8_t sa : 5;
   FuncCode func : 6;
-};
+} __attribute__((aligned(4)));
 
 // RegImm-type
 struct RegisterImmediateInstruction {
@@ -440,7 +441,7 @@ struct RegisterImmediateInstruction {
   uint8_t rs : 5;
   RegImmOp rt : 5;
   uint16_t immediate : 16;
-};
+} __attribute__((aligned(4)));
 
 // Coprocessor-type
 enum CoprocessorType {
@@ -459,27 +460,28 @@ struct CoprocessorCoFuncInstruction {
   OpCode op : 6;
   bool unused : 1;
   uint32_t data : 25;
-};
+} __attribute__((aligned(4)));
 struct CoprocessorOpNoRegisterInstruction {
   OpCode op : 6;
   CoprocessorOp cop_op : 5;
   CoprocessorSubOp sub_op : 5;
   uint16_t immediate : 16;
-};
+} __attribute__((aligned(4)));
 struct CoprocessorOpRegisterInstruction {
   OpCode op : 6;
   CoprocessorOp cop_op : 5;
   uint8_t rt : 5;
   uint8_t rd : 5;
-};
+  uint16_t unused : 11;
+} __attribute__((aligned(4)));
 struct CoprocessorFPUInstruction {
   OpCode op : 6;
   FPUFormat fmt : 5;
   uint8_t ft : 5;
   uint8_t fs : 5;
   uint8_t fd : 5;
-  uint8_t func : 6; // TODO: Make this an enum.
-};
+  uint8_t func : 6;
+} __attribute__((aligned(4)));
 struct CoprocessorInstruction {
   CoprocessorType type;
   FullOp full_op;
@@ -488,8 +490,8 @@ struct CoprocessorInstruction {
     CoprocessorOpNoRegisterInstruction cop_op_no_register;
     CoprocessorOpRegisterInstruction cop_op_register;
     CoprocessorFPUInstruction cop_fpu;
-  };
-};
+  } __attribute__((aligned(4)));
+} __attribute__((aligned(4)));
 
 // Cache operation
 struct CacheInstruction {
@@ -497,7 +499,7 @@ struct CacheInstruction {
   uint8_t base : 5;
   CacheOp cache_op : 5;
   uint16_t offset : 16;
-};
+} __attribute__((aligned(4)));
 
 struct Instruction {
   InstructionType type;
@@ -508,8 +510,9 @@ struct Instruction {
     RegisterImmediateInstruction regimm;
     CoprocessorInstruction coprocessor;
     CacheInstruction cache;
-  };
+  } __attribute__((aligned(4)));
   FullOp full_op;
-};
+} __attribute__((aligned(4)));
+#pragma pack(pop)
 
 Instruction mips_decode(uint32_t instruction);

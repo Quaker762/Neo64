@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
   // MIPS uses big endian, so swap bytes if on little endian
   instruction = __builtin_bswap32(instruction);
 
+  std::cout << "Instruction: " << std::hex << instruction << std::endl;
+
   Instruction decoded = mips_decode(instruction);
   std::cout << disassemble(decoded) << std::endl;
   return 0;
