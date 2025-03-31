@@ -66,7 +66,7 @@ static FullOp special_op_table[8][8] = {
 Instruction mips_decode_register_type(uint32_t instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_REGISTER;
-  instruction_data.reg = *(RegisterInstruction*)&instruction;
+  populate_register_instruction(&instruction_data.reg, instruction);
 
   uint8_t group = (instruction >> 3) & 0x7;
   uint8_t sub_group = instruction & 0x7;
@@ -97,7 +97,7 @@ static FullOp regimm_op_table[3][8] = {
 Instruction mips_decode_regimm(uint32_t instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_REGISTER_IMMEDIATE;
-  instruction_data.regimm = *(RegisterImmediateInstruction*)&instruction;
+  populate_register_immediate_instruction(&instruction_data.regimm, instruction);
 
   uint8_t group = (instruction >> 19) & 0x3;
   uint8_t sub_group = (instruction >> 16) & 0x7;
@@ -109,7 +109,7 @@ Instruction mips_decode_regimm(uint32_t instruction) {
 Instruction mips_decode_cache_type(uint32_t instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_CACHE;
-  instruction_data.cache = *(CacheInstruction*)&instruction;
+  populate_cache_instruction(&instruction_data.cache, instruction);
 
   switch (instruction_data.cache.cache_op) {
     case CACHE_OP_INDEX_INVALIDATE:
@@ -162,7 +162,7 @@ template <FullOp full_op>
 Instruction mips_decode_jump_type(uint32_t instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_JUMP;
-  instruction_data.jump = *(JumpInstruction*)&instruction;
+  populate_jump_instruction(&instruction_data.jump, instruction);
   instruction_data.full_op = full_op;
   return instruction_data;
 }
@@ -171,7 +171,7 @@ template <FullOp full_op>
 Instruction mips_decode_immediate_type(uint32_t instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_IMMEDIATE;
-  instruction_data.immediate = *(ImmediateInstruction*)&instruction;
+  populate_immediate_instruction(&instruction_data.immediate, instruction);
   instruction_data.full_op = full_op;
   return instruction_data;
 }
@@ -282,14 +282,14 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
   if (group >= 2) {
     if (proc_num == 1) {
       coprocessor_instruction.type = COP_TYPE_FPU;
-      coprocessor_instruction.cop_fpu = *(CoprocessorFPUInstruction*)&instruction;
+      populate_coprocessor_fpu_instruction(&coprocessor_instruction.cop_fpu, instruction);
 
       uint8_t fpu_group = (instruction >> 3) & 0x7;
       uint8_t fpu_sub_group = instruction & 0x7;
       coprocessor_instruction.full_op = fpu_op_table[fpu_group][fpu_sub_group];
     } else {
       coprocessor_instruction.type = COP_TYPE_COFUNC;
-      coprocessor_instruction.cop_co_func = *(CoprocessorCoFuncInstruction*)&instruction;
+      populate_coprocessor_co_func_instruction(&coprocessor_instruction.cop_co_func, instruction);
 
       if (proc_num == 0) {
         uint8_t cop0_group = (instruction >> 3) & 0x7;
@@ -303,14 +303,14 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
     coprocessor_instruction.type = coprocessor_op_table[group][sub_group];
     switch (coprocessor_instruction.type) {
       case COP_TYPE_OP_NO_REGISTER: {
-        coprocessor_instruction.cop_op_no_register = *(CoprocessorOpNoRegisterInstruction*)&instruction;
+        populate_coprocessor_op_no_register_instruction(&coprocessor_instruction.cop_op_no_register, instruction);
         // Decode the full operation.
         switch (coprocessor_instruction.cop_op_no_register.sub_op) {
           case COP_OP_BCF: {
             MAP_COP_INSTRUCTION(BC, F)
             break;
           }
-        case COP_OP_BCT: {
+          case COP_OP_BCT: {
             MAP_COP_INSTRUCTION(BC, T)
             break;
           }
@@ -328,7 +328,7 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
         break;
       }
       case COP_TYPE_OP_REGISTER: {
-        coprocessor_instruction.cop_op_register = *(CoprocessorOpRegisterInstruction*)&instruction;
+        populate_coprocessor_op_register_instruction(&coprocessor_instruction.cop_op_register, instruction);
         // Decode the full operation.
         switch (coprocessor_instruction.cop_op_register.cop_op) {
           case COP_CF: {
@@ -360,6 +360,8 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
         throw std::runtime_error("Should not get here");
     }
   }
+
+  instruction_data.coprocessor = coprocessor_instruction;
   return instruction_data;
 }
 

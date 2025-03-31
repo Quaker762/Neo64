@@ -410,37 +410,43 @@ enum CacheOp {
   CACHE_OP_HIT_WRITE_BACK_DATA_CACHE         = 0b110'01,
 };
 
+enum FPUFormat {
+  FMT_SINGLE = 16,
+  FMT_DOUBLE = 17,
+  FMT_WORD = 20,
+  FMT_LONG = 21,
+};
+
 // I-type
-#pragma pack(push, 1)
 struct ImmediateInstruction {
-  uint16_t immediate : 16;
-  uint8_t rt : 5;
-  uint8_t rs : 5;
-  OpCode op : 6;
+  uint16_t immediate;
+  uint8_t rt;
+  uint8_t rs;
+  OpCode op;
 } __attribute__((aligned(4)));
 
 // J-type
 struct JumpInstruction {
-  OpCode op : 6;
-  uint32_t target : 26;
+  uint32_t target;
+  OpCode op;
 } __attribute__((aligned(4)));
 
 // R-type
 struct RegisterInstruction {
-  OpCode op : 6;
-  uint8_t rs : 5;
-  uint8_t rt : 5;
-  uint8_t rd : 5;
-  uint8_t sa : 5;
-  FuncCode func : 6;
+  FuncCode func;
+  uint8_t sa;
+  uint8_t rd;
+  uint8_t rt;
+  uint8_t rs;
+  OpCode op;
 } __attribute__((aligned(4)));
 
 // RegImm-type
 struct RegisterImmediateInstruction {
-  OpCode op : 6;
-  uint8_t rs : 5;
-  RegImmOp rt : 5;
-  uint16_t immediate : 16;
+  uint16_t immediate;
+  RegImmOp rt;
+  uint8_t rs;
+  OpCode op;
 } __attribute__((aligned(4)));
 
 // Coprocessor-type
@@ -450,38 +456,37 @@ enum CoprocessorType {
   COP_TYPE_COFUNC,
   COP_TYPE_FPU,
 };
-enum FPUFormat {
-  FMT_SINGLE = 16,
-  FMT_DOUBLE = 17,
-  FMT_WORD = 20,
-  FMT_LONG = 21,
-};
+
 struct CoprocessorCoFuncInstruction {
-  OpCode op : 6;
-  bool unused : 1;
-  uint32_t data : 25;
+  uint32_t data;
+  bool unused;
+  OpCode op;
 } __attribute__((aligned(4)));
+
 struct CoprocessorOpNoRegisterInstruction {
-  OpCode op : 6;
-  CoprocessorOp cop_op : 5;
-  CoprocessorSubOp sub_op : 5;
-  uint16_t immediate : 16;
+  uint16_t immediate;
+  CoprocessorSubOp sub_op;
+  CoprocessorOp cop_op;
+  OpCode op;
 } __attribute__((aligned(4)));
+
 struct CoprocessorOpRegisterInstruction {
-  OpCode op : 6;
-  CoprocessorOp cop_op : 5;
-  uint8_t rt : 5;
-  uint8_t rd : 5;
-  uint16_t unused : 11;
+  uint16_t unused;
+  uint8_t rd;
+  uint8_t rt;
+  CoprocessorOp cop_op;
+  OpCode op;
 } __attribute__((aligned(4)));
+
 struct CoprocessorFPUInstruction {
-  OpCode op : 6;
-  FPUFormat fmt : 5;
-  uint8_t ft : 5;
-  uint8_t fs : 5;
-  uint8_t fd : 5;
-  uint8_t func : 6;
+  uint8_t func;
+  uint8_t fd;
+  uint8_t fs;
+  uint8_t ft;
+  FPUFormat fmt;
+  OpCode op;
 } __attribute__((aligned(4)));
+
 struct CoprocessorInstruction {
   CoprocessorType type;
   FullOp full_op;
@@ -490,19 +495,21 @@ struct CoprocessorInstruction {
     CoprocessorOpNoRegisterInstruction cop_op_no_register;
     CoprocessorOpRegisterInstruction cop_op_register;
     CoprocessorFPUInstruction cop_fpu;
-  } __attribute__((aligned(4)));
+  };
 } __attribute__((aligned(4)));
 
 // Cache operation
 struct CacheInstruction {
-  OpCode op : 6;
-  uint8_t base : 5;
-  CacheOp cache_op : 5;
-  uint16_t offset : 16;
+  uint16_t offset;
+  CacheOp cache_op;
+  uint8_t base;
+  OpCode op;
 } __attribute__((aligned(4)));
 
+// Base instruction type
 struct Instruction {
   InstructionType type;
+  FullOp full_op;
   union {
     ImmediateInstruction immediate;
     JumpInstruction jump;
@@ -510,9 +517,94 @@ struct Instruction {
     RegisterImmediateInstruction regimm;
     CoprocessorInstruction coprocessor;
     CacheInstruction cache;
-  } __attribute__((aligned(4)));
-  FullOp full_op;
-} __attribute__((aligned(4)));
-#pragma pack(pop)
+  };
+};
+
+// Helper functions to extract fields from instructions
+inline uint16_t get_immediate(uint32_t raw) { return raw & 0xFFFF; }
+inline uint8_t get_rt(uint32_t raw) { return (raw >> 16) & 0x1F; }
+inline uint8_t get_rs(uint32_t raw) { return (raw >> 21) & 0x1F; }
+inline OpCode get_op(uint32_t raw) { return static_cast<OpCode>((raw >> 26) & 0x3F); }
+inline uint32_t get_target(uint32_t raw) { return raw & 0x3FFFFFF; }
+inline uint8_t get_rd(uint32_t raw) { return (raw >> 11) & 0x1F; }
+inline uint8_t get_sa(uint32_t raw) { return (raw >> 6) & 0x1F; }
+inline FuncCode get_func(uint32_t raw) { return static_cast<FuncCode>(raw & 0x3F); }
+inline RegImmOp get_regimm_rt(uint32_t raw) { return static_cast<RegImmOp>((raw >> 16) & 0x1F); }
+inline CoprocessorOp get_cop_op(uint32_t raw) { return static_cast<CoprocessorOp>((raw >> 21) & 0x1F); }
+inline CoprocessorSubOp get_cop_sub_op(uint32_t raw) { return static_cast<CoprocessorSubOp>((raw >> 16) & 0x1F); }
+inline FPUFormat get_fmt(uint32_t raw) { return static_cast<FPUFormat>((raw >> 21) & 0x1F); }
+inline uint8_t get_ft(uint32_t raw) { return (raw >> 16) & 0x1F; }
+inline uint8_t get_fs(uint32_t raw) { return (raw >> 11) & 0x1F; }
+inline uint8_t get_fd(uint32_t raw) { return (raw >> 6) & 0x1F; }
+inline uint8_t get_fpu_func(uint32_t raw) { return raw & 0x3F; }
+inline uint8_t get_base(uint32_t raw) { return (raw >> 21) & 0x1F; }
+inline CacheOp get_cache_op(uint32_t raw) { return static_cast<CacheOp>((raw >> 16) & 0x1F); }
+inline uint16_t get_offset(uint32_t raw) { return raw & 0xFFFF; }
+
+// Helper functions to populate instruction structs using bitwise operations
+inline void populate_immediate_instruction(ImmediateInstruction* inst, uint32_t raw) {
+  inst->immediate = get_immediate(raw);
+  inst->rt = get_rt(raw);
+  inst->rs = get_rs(raw);
+  inst->op = get_op(raw);
+}
+
+inline void populate_jump_instruction(JumpInstruction* inst, uint32_t raw) {
+  inst->target = get_target(raw);
+  inst->op = get_op(raw);
+}
+
+inline void populate_register_instruction(RegisterInstruction* inst, uint32_t raw) {
+  inst->func = get_func(raw);
+  inst->sa = get_sa(raw);
+  inst->rd = get_rd(raw);
+  inst->rt = get_rt(raw);
+  inst->rs = get_rs(raw);
+  inst->op = get_op(raw);
+}
+
+inline void populate_register_immediate_instruction(RegisterImmediateInstruction* inst, uint32_t raw) {
+  inst->immediate = get_immediate(raw);
+  inst->rt = get_regimm_rt(raw);
+  inst->rs = get_rs(raw);
+  inst->op = get_op(raw);
+}
+
+inline void populate_coprocessor_co_func_instruction(CoprocessorCoFuncInstruction* inst, uint32_t raw) {
+  inst->data = raw & 0x1FFFFFF;
+  inst->unused = (raw >> 25) & 0x1;
+  inst->op = get_op(raw);
+}
+
+inline void populate_coprocessor_op_no_register_instruction(CoprocessorOpNoRegisterInstruction* inst, uint32_t raw) {
+  inst->immediate = get_immediate(raw);
+  inst->sub_op = get_cop_sub_op(raw);
+  inst->cop_op = get_cop_op(raw);
+  inst->op = get_op(raw);
+}
+
+inline void populate_coprocessor_op_register_instruction(CoprocessorOpRegisterInstruction* inst, uint32_t raw) {
+  inst->unused = raw & 0x7FF;
+  inst->rd = get_rd(raw);
+  inst->rt = get_rt(raw);
+  inst->cop_op = get_cop_op(raw);
+  inst->op = get_op(raw);
+}
+
+inline void populate_coprocessor_fpu_instruction(CoprocessorFPUInstruction* inst, uint32_t raw) {
+  inst->func = get_fpu_func(raw);
+  inst->fd = get_fd(raw);
+  inst->fs = get_fs(raw);
+  inst->ft = get_ft(raw);
+  inst->fmt = get_fmt(raw);
+  inst->op = get_op(raw);
+}
+
+inline void populate_cache_instruction(CacheInstruction* inst, uint32_t raw) {
+  inst->offset = get_offset(raw);
+  inst->cache_op = get_cache_op(raw);
+  inst->base = get_base(raw);
+  inst->op = get_op(raw);
+}
 
 Instruction mips_decode(uint32_t instruction);
