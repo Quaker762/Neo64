@@ -4,7 +4,7 @@
 #include "decoder.h"
 #include "disassembler.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   if (argc != 2) {
     std::cerr << "Usage: " << argv[0] << " <bios_file>" << std::endl;
     return 1;
@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
   }
 
   uint32_t instruction;
-  if (!bios.read(reinterpret_cast<char*>(&instruction), sizeof(instruction))) {
+  if (!bios.read(reinterpret_cast<char *>(&instruction), sizeof(instruction))) {
     std::cerr << "Failed to read instruction from BIOS" << std::endl;
     return 1;
   }

@@ -2,6 +2,9 @@
 #include <cstdint>
 
 enum FullOp {
+  // For invalid instruction detection
+  FULL_OP_INVALID,
+
   // R-type instructions
   FULL_OP_ADD,
   FULL_OP_ADDU,
@@ -222,192 +225,192 @@ enum InstructionType {
 // Across all instruction types
 enum OpCode {
   OP_SPECIAL = 0b000000,
-  OP_REGIMM  = 0b000001,
-  OP_ADDI    = 0b001000,
-  OP_ADDIU   = 0b001001,
-  OP_ANDI    = 0b001100,
-  OP_COPZ    = 0b010000, // Last two bits determine coprocessor number
-  OP_COP0    = 0b010000,
-  OP_COP1    = 0b010001,
-  OP_COP2    = 0b010010,
-  OP_COP3    = 0b010011,
-  OP_BEQ     = 0b000100,
-  OP_BEQL    = 0b010100,
-  OP_BGTZ    = 0b000111,
-  OP_BGTZL   = 0b010111,
-  OP_BLEZ    = 0b000110,
-  OP_BLEZL   = 0b010110,
-  OP_BNE     = 0b000101,
-  OP_BNEL    = 0b010101,
-  OP_CACHE   = 0b101111,
-  OP_DADDI   = 0b011000,
-  OP_DADDIU  = 0b011001,
-  OP_JUMP    = 0b000010,
-  OP_JAL     = 0b000011,
-  OP_LB      = 0b100000,
-  OP_LBU     = 0b100100,
-  OP_LD      = 0b110111,
-  OP_LDCZ    = 0b110100, // Last two bits determine coprocessor number
-  OP_LDC0    = 0b110100,
-  OP_LDC1    = 0b110101,
-  OP_LDC2    = 0b110110,
-  OP_LDL     = 0b011010,
-  OP_LH      = 0b100001,
-  OP_LHU     = 0b100101,
-  OP_LL      = 0b110000,
-  OP_LLD     = 0b110100,
-  OP_LUI     = 0b001111,
-  OP_LW      = 0b100011,
-  OP_LWCZ    = 0b110000, // Last two bits determine coprocessor number
-  OP_LWC0    = 0b110000,
-  OP_LWC1    = 0b110001,
-  OP_LWC2    = 0b110010,
-  OP_LWL     = 0b100010,
-  OP_LWR     = 0b100110,
-  OP_LWU     = 0b100111,
-  OP_ORI     = 0b001101,
-  OP_SB      = 0b101000,
-  OP_SC      = 0b111000,
-  OP_SCD     = 0b111100,
-  OP_SD      = 0b111111,
-  OP_SDCZ    = 0b111100, // Last two bits determine coprocessor number
-  OP_SDC0    = 0b111100,
-  OP_SDC1    = 0b111101,
-  OP_SDC2    = 0b111110,
-  OP_SDL     = 0b101100,
-  OP_SDR     = 0b101101,
-  OP_SH      = 0b101001,
-  OP_SLTI    = 0b001010,
-  OP_SLTIU   = 0b001011,
-  OP_SW      = 0b101011,
-  OP_SWCZ    = 0b111000, // Last two bits determine coprocessor number
-  OP_SWC0    = 0b111000,
-  OP_SWC1    = 0b111001,
-  OP_SWC2    = 0b111010,
-  OP_SWL     = 0b101010,
-  OP_SWR     = 0b101110,
-  OP_XORI    = 0b001110,
+  OP_REGIMM = 0b000001,
+  OP_ADDI = 0b001000,
+  OP_ADDIU = 0b001001,
+  OP_ANDI = 0b001100,
+  OP_COPZ = 0b010000, // Last two bits determine coprocessor number
+  OP_COP0 = 0b010000,
+  OP_COP1 = 0b010001,
+  OP_COP2 = 0b010010,
+  OP_COP3 = 0b010011,
+  OP_BEQ = 0b000100,
+  OP_BEQL = 0b010100,
+  OP_BGTZ = 0b000111,
+  OP_BGTZL = 0b010111,
+  OP_BLEZ = 0b000110,
+  OP_BLEZL = 0b010110,
+  OP_BNE = 0b000101,
+  OP_BNEL = 0b010101,
+  OP_CACHE = 0b101111,
+  OP_DADDI = 0b011000,
+  OP_DADDIU = 0b011001,
+  OP_JUMP = 0b000010,
+  OP_JAL = 0b000011,
+  OP_LB = 0b100000,
+  OP_LBU = 0b100100,
+  OP_LD = 0b110111,
+  OP_LDCZ = 0b110100, // Last two bits determine coprocessor number
+  OP_LDC0 = 0b110100,
+  OP_LDC1 = 0b110101,
+  OP_LDC2 = 0b110110,
+  OP_LDL = 0b011010,
+  OP_LH = 0b100001,
+  OP_LHU = 0b100101,
+  OP_LL = 0b110000,
+  OP_LLD = 0b110100,
+  OP_LUI = 0b001111,
+  OP_LW = 0b100011,
+  OP_LWCZ = 0b110000, // Last two bits determine coprocessor number
+  OP_LWC0 = 0b110000,
+  OP_LWC1 = 0b110001,
+  OP_LWC2 = 0b110010,
+  OP_LWL = 0b100010,
+  OP_LWR = 0b100110,
+  OP_LWU = 0b100111,
+  OP_ORI = 0b001101,
+  OP_SB = 0b101000,
+  OP_SC = 0b111000,
+  OP_SCD = 0b111100,
+  OP_SD = 0b111111,
+  OP_SDCZ = 0b111100, // Last two bits determine coprocessor number
+  OP_SDC0 = 0b111100,
+  OP_SDC1 = 0b111101,
+  OP_SDC2 = 0b111110,
+  OP_SDL = 0b101100,
+  OP_SDR = 0b101101,
+  OP_SH = 0b101001,
+  OP_SLTI = 0b001010,
+  OP_SLTIU = 0b001011,
+  OP_SW = 0b101011,
+  OP_SWCZ = 0b111000, // Last two bits determine coprocessor number
+  OP_SWC0 = 0b111000,
+  OP_SWC1 = 0b111001,
+  OP_SWC2 = 0b111010,
+  OP_SWL = 0b101010,
+  OP_SWR = 0b101110,
+  OP_XORI = 0b001110,
 };
 
 // R-type
 enum FuncCode {
-  FUNC_ADD     = 0b100000,
-  FUNC_ADDU    = 0b100001,
-  FUNC_AND     = 0b100100,
-  FUNC_BREAK   = 0b001101,
-  FUNC_DADD    = 0b101100,
-  FUNC_DADDU   = 0b101101,
-  FUNC_DDIV    = 0b011110,
-  FUNC_DDIVU   = 0b011111,
-  FUNC_DIV     = 0b011010,
-  FUNC_DIVU    = 0b011011,
-  FUNC_DMULT   = 0b011100,
-  FUNC_DMULTU  = 0b011101,
-  FUNC_DSLL    = 0b111000,
-  FUNC_DSLLV   = 0b010100,
-  FUNC_DSLL32  = 0b111100,
-  FUNC_DSRA    = 0b111011,
-  FUNC_DSRAV   = 0b010111,
-  FUNC_DSRA32  = 0b111111,
-  FUNC_DSRL    = 0b111010,
-  FUNC_DSRLV   = 0b010110,
-  FUNC_DSLR32  = 0b111110,
-  FUNC_DSUB    = 0b101110,
-  FUNC_DSUBU   = 0b101111,
-  FUNC_ERET    = 0b011000, // TODO: Should this be in here?
-  FUNC_JALR    = 0b001001,
-  FUNC_JR      = 0b001000,
-  FUNC_MFHI    = 0b010000,
-  FUNC_MFLO    = 0b010010,
-  FUNC_MTHI    = 0b010001,
-  FUNC_MTLO    = 0b010011,
-  FUNC_MULT    = 0b011000,
-  FUNC_MULTU   = 0b011001,
-  FUNC_NOR     = 0b100111,
-  FUNC_OR      = 0b100101,
-  FUNC_SLL     = 0b000000,
-  FUNC_SLLV    = 0b000100,
-  FUNC_SLT     = 0b101010,
-  FUNC_SLTU    = 0b101011,
-  FUNC_SRA     = 0b000011,
-  FUNC_SRAV    = 0b000111,
-  FUNC_SRL     = 0b000010,
-  FUNC_SRLV    = 0b000110,
-  FUNC_SUB     = 0b100010,
-  FUNC_SUBU    = 0b100011,
-  FUNC_SYNC    = 0b001111,
+  FUNC_ADD = 0b100000,
+  FUNC_ADDU = 0b100001,
+  FUNC_AND = 0b100100,
+  FUNC_BREAK = 0b001101,
+  FUNC_DADD = 0b101100,
+  FUNC_DADDU = 0b101101,
+  FUNC_DDIV = 0b011110,
+  FUNC_DDIVU = 0b011111,
+  FUNC_DIV = 0b011010,
+  FUNC_DIVU = 0b011011,
+  FUNC_DMULT = 0b011100,
+  FUNC_DMULTU = 0b011101,
+  FUNC_DSLL = 0b111000,
+  FUNC_DSLLV = 0b010100,
+  FUNC_DSLL32 = 0b111100,
+  FUNC_DSRA = 0b111011,
+  FUNC_DSRAV = 0b010111,
+  FUNC_DSRA32 = 0b111111,
+  FUNC_DSRL = 0b111010,
+  FUNC_DSRLV = 0b010110,
+  FUNC_DSLR32 = 0b111110,
+  FUNC_DSUB = 0b101110,
+  FUNC_DSUBU = 0b101111,
+  FUNC_ERET = 0b011000, // TODO: Should this be in here?
+  FUNC_JALR = 0b001001,
+  FUNC_JR = 0b001000,
+  FUNC_MFHI = 0b010000,
+  FUNC_MFLO = 0b010010,
+  FUNC_MTHI = 0b010001,
+  FUNC_MTLO = 0b010011,
+  FUNC_MULT = 0b011000,
+  FUNC_MULTU = 0b011001,
+  FUNC_NOR = 0b100111,
+  FUNC_OR = 0b100101,
+  FUNC_SLL = 0b000000,
+  FUNC_SLLV = 0b000100,
+  FUNC_SLT = 0b101010,
+  FUNC_SLTU = 0b101011,
+  FUNC_SRA = 0b000011,
+  FUNC_SRAV = 0b000111,
+  FUNC_SRL = 0b000010,
+  FUNC_SRLV = 0b000110,
+  FUNC_SUB = 0b100010,
+  FUNC_SUBU = 0b100011,
+  FUNC_SYNC = 0b001111,
   FUNC_SYSCALL = 0b001100,
-  FUNC_TEQ     = 0b110100,
-  FUNC_TGE     = 0b110000,
-  FUNC_TGEU    = 0b110001,
-  FUNC_TLBP    = 0b001000, // TODO: Should this be in here?
-  FUNC_TLBR    = 0b000001, // TODO: Should this be in here?
-  FUNC_TLBWI   = 0b000010, // TODO: Should this be in here?
-  FUNC_TLBWR   = 0b000110,
-  FUNC_TLT     = 0b110010,
-  FUNC_TLTU    = 0b110011,
-  FUNC_TNE     = 0b110110,
-  FUNC_XOR     = 0b100110,
+  FUNC_TEQ = 0b110100,
+  FUNC_TGE = 0b110000,
+  FUNC_TGEU = 0b110001,
+  FUNC_TLBP = 0b001000,  // TODO: Should this be in here?
+  FUNC_TLBR = 0b000001,  // TODO: Should this be in here?
+  FUNC_TLBWI = 0b000010, // TODO: Should this be in here?
+  FUNC_TLBWR = 0b000110,
+  FUNC_TLT = 0b110010,
+  FUNC_TLTU = 0b110011,
+  FUNC_TNE = 0b110110,
+  FUNC_XOR = 0b100110,
 };
 
 // Coprocessor Sub-opcodes
 enum CoprocessorOp {
-  COP_BC  = 0b01000,
-  COP_CF  = 0b00010,
-  COP_CO  = 0b10000,
-  COP_CT  = 0b00110,
+  COP_BC = 0b01000,
+  COP_CF = 0b00010,
+  COP_CO = 0b10000,
+  COP_CT = 0b00110,
   COP_DMF = 0b00001,
   COP_DMT = 0b00101,
-  COP_MF  = 0b00000,
-  COP_MT  = 0b00100,
+  COP_MF = 0b00000,
+  COP_MT = 0b00100,
 };
 enum CoprocessorSubOp {
-  COP_OP_BCF  = 0b00000,
+  COP_OP_BCF = 0b00000,
   COP_OP_BCFL = 0b00010,
-  COP_OP_BCT  = 0b00001,
+  COP_OP_BCT = 0b00001,
   COP_OP_BCTL = 0b00011,
 };
 
 // Branch Condition
 enum BranchCondition {
-  BRANCH_FALSE        = 0b00000,
-  BRANCH_TRUE         = 0b00001,
+  BRANCH_FALSE = 0b00000,
+  BRANCH_TRUE = 0b00001,
   BRANCH_FALSE_LIKELY = 0b00010,
-  BRANCH_TRUE_LIKELY  = 0b00011,
+  BRANCH_TRUE_LIKELY = 0b00011,
 };
 
 // REGIMM Op, determine op from rt field with the following:
 enum RegImmOp {
-  REGIMM_OP_BLTZ    = 0b00000,
-  REGIMM_OP_BGEZ    = 0b00001,
-  REGIMM_OP_BLTZAL  = 0b10000,
-  REGIMM_OP_BGEZAL  = 0b10001,
+  REGIMM_OP_BLTZ = 0b00000,
+  REGIMM_OP_BGEZ = 0b00001,
+  REGIMM_OP_BLTZAL = 0b10000,
+  REGIMM_OP_BGEZAL = 0b10001,
   REGIMM_OP_BGEZALL = 0b10011,
-  REGIMM_OP_BGEZL   = 0b00011,
+  REGIMM_OP_BGEZL = 0b00011,
   REGIMM_OP_BLTZALL = 0b10010,
-  REGIMM_OP_BLTZL   = 0b00010,
-  REGIMM_OP_TEQI    = 0b01100,
-  REGIMM_OP_TGEI    = 0b01000,
-  REGIMM_OP_TGEIU   = 0b01001,
-  REGIMM_OP_TLTI    = 0b01010,
-  REGIMM_OP_TLTIU   = 0b01011,
-  REGIMM_OP_TNEI    = 0b01110,
+  REGIMM_OP_BLTZL = 0b00010,
+  REGIMM_OP_TEQI = 0b01100,
+  REGIMM_OP_TGEI = 0b01000,
+  REGIMM_OP_TGEIU = 0b01001,
+  REGIMM_OP_TLTI = 0b01010,
+  REGIMM_OP_TLTIU = 0b01011,
+  REGIMM_OP_TNEI = 0b01110,
 };
 
 enum CacheOp {
-  CACHE_OP_INDEX_INVALIDATE                  = 0b000'00,
-  CACHE_OP_INDEX_WRITE_BACK_INVALIDATE       = 0b000'01,
-  CACHE_OP_INDEX_LOAD_TAG_INSTRUCTION_CACHE  = 0b001'00,
-  CACHE_OP_INDEX_LOAD_TAG_DATA_CACHE         = 0b001'01,
+  CACHE_OP_INDEX_INVALIDATE = 0b000'00,
+  CACHE_OP_INDEX_WRITE_BACK_INVALIDATE = 0b000'01,
+  CACHE_OP_INDEX_LOAD_TAG_INSTRUCTION_CACHE = 0b001'00,
+  CACHE_OP_INDEX_LOAD_TAG_DATA_CACHE = 0b001'01,
   CACHE_OP_INDEX_STORE_TAG_INSTRUCTION_CACHE = 0b010'00,
-  CACHE_OP_INDEX_STORE_TAG_DATA_CACHE        = 0b010'01,
-  CACHE_OP_CREATE_DIRTY_EXCLUSIVE            = 0b011'01,
-  CACHE_OP_HIT_INVALIDATE_INSTRUCTION_CACHE  = 0b100'00,
-  CACHE_OP_HIT_INVALIDATE_DATA_CACHE         = 0b100'01,
-  CACHE_OP_HIT_WRITE_BACK_INVALIDATE         = 0b101'01,
-  CACHE_OP_FILL                              = 0b101'00,
-  CACHE_OP_HIT_WRITE_BACK_INSTRUCTION_CACHE  = 0b110'00,
-  CACHE_OP_HIT_WRITE_BACK_DATA_CACHE         = 0b110'01,
+  CACHE_OP_INDEX_STORE_TAG_DATA_CACHE = 0b010'01,
+  CACHE_OP_CREATE_DIRTY_EXCLUSIVE = 0b011'01,
+  CACHE_OP_HIT_INVALIDATE_INSTRUCTION_CACHE = 0b100'00,
+  CACHE_OP_HIT_INVALIDATE_DATA_CACHE = 0b100'01,
+  CACHE_OP_HIT_WRITE_BACK_INVALIDATE = 0b101'01,
+  CACHE_OP_FILL = 0b101'00,
+  CACHE_OP_HIT_WRITE_BACK_INSTRUCTION_CACHE = 0b110'00,
+  CACHE_OP_HIT_WRITE_BACK_DATA_CACHE = 0b110'01,
 };
 
 enum FPUFormat {
@@ -524,37 +527,53 @@ struct Instruction {
 inline uint16_t get_immediate(uint32_t raw) { return raw & 0xFFFF; }
 inline uint8_t get_rt(uint32_t raw) { return (raw >> 16) & 0x1F; }
 inline uint8_t get_rs(uint32_t raw) { return (raw >> 21) & 0x1F; }
-inline OpCode get_op(uint32_t raw) { return static_cast<OpCode>((raw >> 26) & 0x3F); }
+inline OpCode get_op(uint32_t raw) {
+  return static_cast<OpCode>((raw >> 26) & 0x3F);
+}
 inline uint32_t get_target(uint32_t raw) { return raw & 0x3FFFFFF; }
 inline uint8_t get_rd(uint32_t raw) { return (raw >> 11) & 0x1F; }
 inline uint8_t get_sa(uint32_t raw) { return (raw >> 6) & 0x1F; }
-inline FuncCode get_func(uint32_t raw) { return static_cast<FuncCode>(raw & 0x3F); }
-inline RegImmOp get_regimm_rt(uint32_t raw) { return static_cast<RegImmOp>((raw >> 16) & 0x1F); }
-inline CoprocessorOp get_cop_op(uint32_t raw) { return static_cast<CoprocessorOp>((raw >> 21) & 0x1F); }
-inline CoprocessorSubOp get_cop_sub_op(uint32_t raw) { return static_cast<CoprocessorSubOp>((raw >> 16) & 0x1F); }
-inline FPUFormat get_fmt(uint32_t raw) { return static_cast<FPUFormat>((raw >> 21) & 0x1F); }
+inline FuncCode get_func(uint32_t raw) {
+  return static_cast<FuncCode>(raw & 0x3F);
+}
+inline RegImmOp get_regimm_rt(uint32_t raw) {
+  return static_cast<RegImmOp>((raw >> 16) & 0x1F);
+}
+inline CoprocessorOp get_cop_op(uint32_t raw) {
+  return static_cast<CoprocessorOp>((raw >> 21) & 0x1F);
+}
+inline CoprocessorSubOp get_cop_sub_op(uint32_t raw) {
+  return static_cast<CoprocessorSubOp>((raw >> 16) & 0x1F);
+}
+inline FPUFormat get_fmt(uint32_t raw) {
+  return static_cast<FPUFormat>((raw >> 21) & 0x1F);
+}
 inline uint8_t get_ft(uint32_t raw) { return (raw >> 16) & 0x1F; }
 inline uint8_t get_fs(uint32_t raw) { return (raw >> 11) & 0x1F; }
 inline uint8_t get_fd(uint32_t raw) { return (raw >> 6) & 0x1F; }
 inline uint8_t get_fpu_func(uint32_t raw) { return raw & 0x3F; }
 inline uint8_t get_base(uint32_t raw) { return (raw >> 21) & 0x1F; }
-inline CacheOp get_cache_op(uint32_t raw) { return static_cast<CacheOp>((raw >> 16) & 0x1F); }
+inline CacheOp get_cache_op(uint32_t raw) {
+  return static_cast<CacheOp>((raw >> 16) & 0x1F);
+}
 inline uint16_t get_offset(uint32_t raw) { return raw & 0xFFFF; }
 
 // Helper functions to populate instruction structs using bitwise operations
-inline void populate_immediate_instruction(ImmediateInstruction* inst, uint32_t raw) {
+inline void populate_immediate_instruction(ImmediateInstruction *inst,
+                                           uint32_t raw) {
   inst->immediate = get_immediate(raw);
   inst->rt = get_rt(raw);
   inst->rs = get_rs(raw);
   inst->op = get_op(raw);
 }
 
-inline void populate_jump_instruction(JumpInstruction* inst, uint32_t raw) {
+inline void populate_jump_instruction(JumpInstruction *inst, uint32_t raw) {
   inst->target = get_target(raw);
   inst->op = get_op(raw);
 }
 
-inline void populate_register_instruction(RegisterInstruction* inst, uint32_t raw) {
+inline void populate_register_instruction(RegisterInstruction *inst,
+                                          uint32_t raw) {
   inst->func = get_func(raw);
   inst->sa = get_sa(raw);
   inst->rd = get_rd(raw);
@@ -563,27 +582,33 @@ inline void populate_register_instruction(RegisterInstruction* inst, uint32_t ra
   inst->op = get_op(raw);
 }
 
-inline void populate_register_immediate_instruction(RegisterImmediateInstruction* inst, uint32_t raw) {
+inline void
+populate_register_immediate_instruction(RegisterImmediateInstruction *inst,
+                                        uint32_t raw) {
   inst->immediate = get_immediate(raw);
   inst->rt = get_regimm_rt(raw);
   inst->rs = get_rs(raw);
   inst->op = get_op(raw);
 }
 
-inline void populate_coprocessor_co_func_instruction(CoprocessorCoFuncInstruction* inst, uint32_t raw) {
+inline void
+populate_coprocessor_co_func_instruction(CoprocessorCoFuncInstruction *inst,
+                                         uint32_t raw) {
   inst->data = raw & 0x1FFFFFF;
   inst->unused = (raw >> 25) & 0x1;
   inst->op = get_op(raw);
 }
 
-inline void populate_coprocessor_op_no_register_instruction(CoprocessorOpNoRegisterInstruction* inst, uint32_t raw) {
+inline void populate_coprocessor_op_no_register_instruction(
+    CoprocessorOpNoRegisterInstruction *inst, uint32_t raw) {
   inst->immediate = get_immediate(raw);
   inst->sub_op = get_cop_sub_op(raw);
   inst->cop_op = get_cop_op(raw);
   inst->op = get_op(raw);
 }
 
-inline void populate_coprocessor_op_register_instruction(CoprocessorOpRegisterInstruction* inst, uint32_t raw) {
+inline void populate_coprocessor_op_register_instruction(
+    CoprocessorOpRegisterInstruction *inst, uint32_t raw) {
   inst->unused = raw & 0x7FF;
   inst->rd = get_rd(raw);
   inst->rt = get_rt(raw);
@@ -591,7 +616,9 @@ inline void populate_coprocessor_op_register_instruction(CoprocessorOpRegisterIn
   inst->op = get_op(raw);
 }
 
-inline void populate_coprocessor_fpu_instruction(CoprocessorFPUInstruction* inst, uint32_t raw) {
+inline void
+populate_coprocessor_fpu_instruction(CoprocessorFPUInstruction *inst,
+                                     uint32_t raw) {
   inst->func = get_fpu_func(raw);
   inst->fd = get_fd(raw);
   inst->fs = get_fs(raw);
@@ -600,7 +627,7 @@ inline void populate_coprocessor_fpu_instruction(CoprocessorFPUInstruction* inst
   inst->op = get_op(raw);
 }
 
-inline void populate_cache_instruction(CacheInstruction* inst, uint32_t raw) {
+inline void populate_cache_instruction(CacheInstruction *inst, uint32_t raw) {
   inst->offset = get_offset(raw);
   inst->cache_op = get_cache_op(raw);
   inst->base = get_base(raw);
