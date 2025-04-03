@@ -2,6 +2,9 @@
     "image": "neo64:latest",
     "containerUser": "ultra64",
     "remoteUser": "ultra64",
+    "runArgs": [
+        "--platform=linux/amd64"
+    ],
     "customizations": {
         "vscode": {
             "extensions": [
