@@ -1,6 +1,7 @@
 #include "disassembler.h"
 #include <sstream>
 #include <stdexcept>
+#include "emu_types.h"
 
 std::string format_hex(int32_t value) {
   std::stringstream ss;
@@ -14,7 +15,7 @@ static const std::string register_table[32] = {
     "$s0",   "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
     "$t8",   "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"};
 
-std::string format_register(uint32_t reg) {
+std::string format_register(u32 reg) {
   if (reg >= 32) {
     throw std::runtime_error("Invalid register");
   }

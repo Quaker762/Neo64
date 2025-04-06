@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 
   long long int location = 0;
   while (bios.good()) {
-    uint32_t instruction;
+    u32 instruction;
     if (!bios.read(reinterpret_cast<char *>(&instruction),
                    sizeof(instruction))) {
       break;

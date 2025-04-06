@@ -20,13 +20,13 @@ static FullOp special_op_table[8][8] = {
      FULL_OP_INVALID, FULL_OP_DSRL32, FULL_OP_DSRA32}};
 
 // A.K.A SPECIAL Function
-Instruction mips_decode_register_type(uint32_t instruction) {
+Instruction mips_decode_register_type(u32 instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_REGISTER;
   populate_register_instruction(&instruction_data.reg, instruction);
 
-  uint8_t group = (instruction >> 3) & 0x7;
-  uint8_t sub_group = instruction & 0x7;
+  u8 group = (instruction >> 3) & 0x7;
+  u8 sub_group = instruction & 0x7;
   instruction_data.full_op = special_op_table[group][sub_group];
 
   return instruction_data;
@@ -38,20 +38,20 @@ static FullOp regimm_op_table[3][8] = {
      FULL_OP_INVALID, FULL_OP_TNEI},
     {FULL_OP_BLTZAL, FULL_OP_BGEZAL, FULL_OP_BLTZALL, FULL_OP_BGEZALL}};
 
-Instruction mips_decode_regimm(uint32_t instruction) {
+Instruction mips_decode_regimm(u32 instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_REGISTER_IMMEDIATE;
   populate_register_immediate_instruction(&instruction_data.regimm,
                                           instruction);
 
-  uint8_t group = (instruction >> 19) & 0x3;
-  uint8_t sub_group = (instruction >> 16) & 0x7;
+  u8 group = (instruction >> 19) & 0x3;
+  u8 sub_group = (instruction >> 16) & 0x7;
   instruction_data.full_op = regimm_op_table[group][sub_group];
 
   return instruction_data;
 }
 
-Instruction mips_decode_cache_type(uint32_t instruction) {
+Instruction mips_decode_cache_type(u32 instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_CACHE;
   populate_cache_instruction(&instruction_data.cache, instruction);
@@ -104,7 +104,7 @@ Instruction mips_decode_cache_type(uint32_t instruction) {
 }
 
 template <FullOp full_op>
-Instruction mips_decode_jump_type(uint32_t instruction) {
+Instruction mips_decode_jump_type(u32 instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_JUMP;
   populate_jump_instruction(&instruction_data.jump, instruction);
@@ -113,7 +113,7 @@ Instruction mips_decode_jump_type(uint32_t instruction) {
 }
 
 template <FullOp full_op>
-Instruction mips_decode_immediate_type(uint32_t instruction) {
+Instruction mips_decode_immediate_type(u32 instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_IMMEDIATE;
   populate_immediate_instruction(&instruction_data.immediate, instruction);
@@ -204,14 +204,14 @@ static FullOp fpu_op_table[8][8] = {
   }                                                                            \
   }
 
-Instruction mips_decode_coprocessor_type(uint32_t instruction) {
+Instruction mips_decode_coprocessor_type(u32 instruction) {
   Instruction instruction_data;
   instruction_data.type = TYPE_COPROCESSOR;
 
   CoprocessorInstruction coprocessor_instruction;
-  uint8_t group = (instruction >> 24) & 0x3;
-  uint8_t sub_group = (instruction >> 21) & 0x7;
-  uint8_t proc_num = (instruction >> 26) & 0x3;
+  u8 group = (instruction >> 24) & 0x3;
+  u8 sub_group = (instruction >> 21) & 0x7;
+  u8 proc_num = (instruction >> 26) & 0x3;
 
   if (group >= 2) {
     if (proc_num == 1) {
@@ -219,8 +219,8 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
       populate_coprocessor_fpu_instruction(&coprocessor_instruction.cop_fpu,
                                            instruction);
 
-      uint8_t fpu_group = (instruction >> 3) & 0x7;
-      uint8_t fpu_sub_group = instruction & 0x7;
+      u8 fpu_group = (instruction >> 3) & 0x7;
+      u8 fpu_sub_group = instruction & 0x7;
       instruction_data.full_op = fpu_op_table[fpu_group][fpu_sub_group];
     } else {
       coprocessor_instruction.type = COP_TYPE_COFUNC;
@@ -228,8 +228,8 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
           &coprocessor_instruction.cop_co_func, instruction);
 
       if (proc_num == 0) {
-        uint8_t cop0_group = (instruction >> 3) & 0x7;
-        uint8_t cop0_sub_group = instruction & 0x7;
+        u8 cop0_group = (instruction >> 3) & 0x7;
+        u8 cop0_sub_group = instruction & 0x7;
         instruction_data.full_op = cop0_op_table[cop0_group][cop0_sub_group];
       } else {
         MAP_COP_INSTRUCTION_NO_SUFFIX(COP)
@@ -304,7 +304,7 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
 }
 
 // See figure 16-1 in 16.7.
-static Instruction (*mips_decode_table[8][8])(uint32_t) = {
+static Instruction (*mips_decode_table[8][8])(u32) = {
     {
         mips_decode_register_type,                // SPECIAL
         mips_decode_regimm,                       // REGIMM
@@ -381,7 +381,7 @@ static Instruction (*mips_decode_table[8][8])(uint32_t) = {
         mips_decode_immediate_type<FULL_OP_SD>    // SD
     }};
 
-Instruction mips_decode(uint32_t instruction) {
+Instruction mips_decode(u32 instruction) {
   // No-op instruction (0x00000000)
   if (instruction == 0x00000000) {
     Instruction instruction_data;
@@ -391,10 +391,10 @@ Instruction mips_decode(uint32_t instruction) {
   }
 
   // 31..29 - Vertical columns in figure 16-1 (Opcode).
-  uint8_t group = (instruction >> 29) & 0x7;
+  u8 group = (instruction >> 29) & 0x7;
 
   // 28..26 - Horizontal columns in figure 16-1 (Opcode).
-  uint8_t sub_group = (instruction >> 26) & 0x7;
+  u8 sub_group = (instruction >> 26) & 0x7;
 
   return mips_decode_table[group][sub_group](instruction);
 }
