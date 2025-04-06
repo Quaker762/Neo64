@@ -8,183 +8,196 @@ std::string format_hex(int32_t value) {
   return ss.str();
 }
 
+static const std::string register_table[32] = {
+    "$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3",
+    "$t0",   "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7",
+    "$s0",   "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
+    "$t8",   "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"};
+
+std::string format_register(uint32_t reg) {
+  if (reg >= 32) {
+    throw std::runtime_error("Invalid register");
+  }
+  return register_table[reg];
+}
+
 std::string disassemble_register(Instruction const &instruction) {
   switch (instruction.full_op) {
   case FULL_OP_ADD:
-    return "add $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "add " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_ADDU:
-    return "addu $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "addu " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_AND:
-    return "and $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "and " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_BREAK:
     return "break";
   case FULL_OP_DADD:
-    return "dadd $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "dadd " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DADDU:
-    return "daddu $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "daddu " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DDIV:
-    return "ddiv $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "ddiv " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DDIVU:
-    return "ddivu $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "ddivu " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DIV:
-    return "div $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "div " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DIVU:
-    return "divu $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "divu " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DMULT:
-    return "dmult $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "dmult " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DMULTU:
-    return "dmultu $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "dmultu " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DSLL:
-    return "dsll $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "dsll " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_DSLL32:
-    return "dsll32 $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "dsll32 " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_DSLLV:
-    return "dsllv $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", $" +
-           std::to_string(instruction.reg.rs);
+    return "dsllv " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
+           format_register(instruction.reg.rs);
   case FULL_OP_DSRA:
-    return "dsra $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "dsra " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_DSRA32:
-    return "dsra32 $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "dsra32 " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_DSRAV:
-    return "dsrav $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", $" +
-           std::to_string(instruction.reg.rs);
+    return "dsrav " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
+           format_register(instruction.reg.rs);
   case FULL_OP_DSRL:
-    return "dsrl $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "dsrl " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_DSRL32:
-    return "dsrl32 $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "dsrl32 " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_DSRLV:
-    return "dsrlv $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", $" +
-           std::to_string(instruction.reg.rs);
+    return "dsrlv " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
+           format_register(instruction.reg.rs);
   case FULL_OP_DSUB:
-    return "dsub $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "dsub " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_DSUBU:
-    return "dsubu $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "dsubu " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_JALR:
-    return "jalr $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs);
+    return "jalr " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs);
   case FULL_OP_JR:
-    return "jr $" + std::to_string(instruction.reg.rs);
+    return "jr " + format_register(instruction.reg.rs);
   case FULL_OP_MFHI:
-    return "mfhi $" + std::to_string(instruction.reg.rd);
+    return "mfhi " + format_register(instruction.reg.rd);
   case FULL_OP_MFLO:
-    return "mflo $" + std::to_string(instruction.reg.rd);
+    return "mflo " + format_register(instruction.reg.rd);
   case FULL_OP_MTHI:
-    return "mthi $" + std::to_string(instruction.reg.rs);
+    return "mthi " + format_register(instruction.reg.rs);
   case FULL_OP_MTLO:
-    return "mtlo $" + std::to_string(instruction.reg.rs);
+    return "mtlo " + format_register(instruction.reg.rs);
   case FULL_OP_MULT:
-    return "mult $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "mult " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_MULTU:
-    return "multu $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "multu " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_NOR:
-    return "nor $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "nor " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_OR:
-    return "or $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "or " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_SLL:
-    return "sll $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "sll " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_SLLV:
-    return "sllv $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", $" +
-           std::to_string(instruction.reg.rs);
+    return "sllv " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
+           format_register(instruction.reg.rs);
   case FULL_OP_SLT:
-    return "slt $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "slt " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_SLTU:
-    return "sltu $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "sltu " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_SRA:
-    return "sra $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "sra " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_SRAV:
-    return "srav $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", $" +
-           std::to_string(instruction.reg.rs);
+    return "srav " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
+           format_register(instruction.reg.rs);
   case FULL_OP_SRL:
-    return "srl $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", " +
+    return "srl " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
            std::to_string(instruction.reg.sa);
   case FULL_OP_SRLV:
-    return "srlv $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rt) + ", $" +
-           std::to_string(instruction.reg.rs);
+    return "srlv " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rt) + ", " +
+           format_register(instruction.reg.rs);
   case FULL_OP_SUB:
-    return "sub $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "sub " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_SUBU:
-    return "subu $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "subu " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_SYSCALL:
     return "syscall";
   case FULL_OP_XOR:
-    return "xor $" + std::to_string(instruction.reg.rd) + ", $" +
-           std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "xor " + format_register(instruction.reg.rd) + ", " +
+           format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_TGE:
-    return "tge $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "tge " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_TGEU:
-    return "tgeu $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "tgeu " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_TLT:
-    return "tlt $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "tlt " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_TLTU:
-    return "tltu $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "tltu " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_TEQ:
-    return "teq $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "teq " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   case FULL_OP_TNE:
-    return "tne $" + std::to_string(instruction.reg.rs) + ", $" +
-           std::to_string(instruction.reg.rt);
+    return "tne " + format_register(instruction.reg.rs) + ", " +
+           format_register(instruction.reg.rt);
   default:
     throw std::runtime_error("Invalid register instruction");
   }
@@ -193,163 +206,163 @@ std::string disassemble_register(Instruction const &instruction) {
 std::string disassemble_immediate(Instruction const &instruction) {
   switch (instruction.full_op) {
   case FULL_OP_ADDI:
-    return "addi $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "addi " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_ADDIU:
-    return "addiu $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "addiu " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_ANDI:
-    return "andi $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "andi " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BEQ:
-    return "beq $" + std::to_string(instruction.immediate.rs) + ", $" +
-           std::to_string(instruction.immediate.rt) + ", " +
+    return "beq " + format_register(instruction.immediate.rs) + ", " +
+           format_register(instruction.immediate.rt) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BEQL:
-    return "beql $" + std::to_string(instruction.immediate.rs) + ", $" +
-           std::to_string(instruction.immediate.rt) + ", " +
+    return "beql " + format_register(instruction.immediate.rs) + ", " +
+           format_register(instruction.immediate.rt) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BGTZ:
-    return "bgtz $" + std::to_string(instruction.immediate.rs) + ", " +
+    return "bgtz " + format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BGTZL:
-    return "bgtzl $" + std::to_string(instruction.immediate.rs) + ", " +
+    return "bgtzl " + format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BLEZ:
-    return "blez $" + std::to_string(instruction.immediate.rs) + ", " +
+    return "blez " + format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BLEZL:
-    return "blezl $" + std::to_string(instruction.immediate.rs) + ", " +
+    return "blezl " + format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BNE:
-    return "bne $" + std::to_string(instruction.immediate.rs) + ", $" +
-           std::to_string(instruction.immediate.rt) + ", " +
+    return "bne " + format_register(instruction.immediate.rs) + ", " +
+           format_register(instruction.immediate.rt) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_BNEL:
-    return "bnel $" + std::to_string(instruction.immediate.rs) + ", $" +
-           std::to_string(instruction.immediate.rt) + ", " +
+    return "bnel " + format_register(instruction.immediate.rs) + ", " +
+           format_register(instruction.immediate.rt) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_DADDI:
-    return "daddi $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "daddi " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_DADDIU:
-    return "daddiu $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "daddiu " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_LB:
-    return "lb $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lb " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LBU:
-    return "lbu $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lbu " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LD:
-    return "ld $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "ld " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LDL:
-    return "ldl $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "ldl " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LDR:
-    return "ldr $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "ldr " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LH:
-    return "lh $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lh " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LHU:
-    return "lhu $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lhu " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LL:
-    return "ll $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "ll " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LLD:
-    return "lld $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lld " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LUI:
-    return "lui $" + std::to_string(instruction.immediate.rt) + ", " +
+    return "lui " + format_register(instruction.immediate.rt) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_LW:
-    return "lw $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lw " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LWL:
-    return "lwl $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lwl " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LWR:
-    return "lwr $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lwr " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_LWU:
-    return "lwu $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "lwu " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_ORI:
-    return "ori $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "ori " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_SB:
-    return "sb $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "sb " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SC:
-    return "sc $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "sc " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SCD:
-    return "scd $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "scd " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SD:
-    return "sd $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "sd " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SDL:
-    return "sdl $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "sdl " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SDR:
-    return "sdr $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "sdr " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SH:
-    return "sh $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "sh " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SLTI:
-    return "slti $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "slti " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_SLTIU:
-    return "sltiu $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "sltiu " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   case FULL_OP_SW:
-    return "sw $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "sw " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SWL:
-    return "swl $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "swl " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_SWR:
-    return "swr $" + std::to_string(instruction.immediate.rt) + ", " +
-           format_hex(instruction.immediate.immediate) + "($" +
-           std::to_string(instruction.immediate.rs) + ")";
+    return "swr " + format_register(instruction.immediate.rt) + ", " +
+           format_hex(instruction.immediate.immediate) + "(" +
+           format_register(instruction.immediate.rs) + ")";
   case FULL_OP_XORI:
-    return "xori $" + std::to_string(instruction.immediate.rt) + ", $" +
-           std::to_string(instruction.immediate.rs) + ", " +
+    return "xori " + format_register(instruction.immediate.rt) + ", " +
+           format_register(instruction.immediate.rs) + ", " +
            format_hex(instruction.immediate.immediate);
   default:
     throw std::runtime_error("Invalid immediate instruction");
@@ -370,46 +383,46 @@ std::string disassemble_jump(Instruction const &instruction) {
 std::string disassemble_register_immediate(Instruction const &instruction) {
   switch (instruction.full_op) {
   case FULL_OP_BLTZ:
-    return "bltz $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bltz " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_BGEZ:
-    return "bgez $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bgez " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_BLTZL:
-    return "bltzl $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bltzl " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_BGEZL:
-    return "bgezl $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bgezl " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_TGEI:
-    return "tgei $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "tgei " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_TGEIU:
-    return "tgeiu $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "tgeiu " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_TLTI:
-    return "tlti $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "tlti " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_TLTIU:
-    return "tltiu $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "tltiu " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_TEQI:
-    return "teqi $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "teqi " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_TNEI:
-    return "tnei $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "tnei " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_BLTZAL:
-    return "bltzal $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bltzal " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_BGEZAL:
-    return "bgezal $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bgezal " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_BLTZALL:
-    return "bltzall $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bltzall " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   case FULL_OP_BGEZALL:
-    return "bgezall $" + std::to_string(instruction.regimm.rs) + ", " +
+    return "bgezall " + format_register(instruction.regimm.rs) + ", " +
            format_hex(instruction.regimm.immediate);
   default:
     throw std::runtime_error("Invalid register immediate instruction");
@@ -535,32 +548,32 @@ std::string disassemble_coprocessor(Instruction const &instruction) {
   case FULL_OP_ERET:
     return "eret";
   case FULL_OP_MTC0:
-    return "mtc0 $" +
-           std::to_string(instruction.coprocessor.cop_op_register.rt) + ", " +
+    return "mtc0 " +
+           format_register(instruction.coprocessor.cop_op_register.rt) + ", $" +
            std::to_string(instruction.coprocessor.cop_op_register.rd);
   case FULL_OP_MFC0:
-    return "mfc0 $" +
-           std::to_string(instruction.coprocessor.cop_op_register.rt) + ", " +
+    return "mfc0 " +
+           format_register(instruction.coprocessor.cop_op_register.rt) + ", $" +
            std::to_string(instruction.coprocessor.cop_op_register.rd);
   case FULL_OP_DMTC0:
-    return "dmfc0 $" +
-           std::to_string(instruction.coprocessor.cop_op_register.rt) + ", " +
+    return "dmfc0 " +
+           format_register(instruction.coprocessor.cop_op_register.rt) + ", $" +
            std::to_string(instruction.coprocessor.cop_op_register.rd);
   case FULL_OP_DMFC0:
-    return "dmfc0 $" +
-           std::to_string(instruction.coprocessor.cop_op_register.rt) + ", " +
+    return "dmfc0 " +
+           format_register(instruction.coprocessor.cop_op_register.rt) + ", $" +
            std::to_string(instruction.coprocessor.cop_op_register.rd);
   case FULL_OP_CFC0:
-    return "cfc0 $" +
-           std::to_string(instruction.coprocessor.cop_op_register.rt) + ", " +
+    return "cfc0 " +
+           format_register(instruction.coprocessor.cop_op_register.rt) + ", $" +
            std::to_string(instruction.coprocessor.cop_op_register.rd);
   case FULL_OP_CFC1:
-    return "cfc1 $" +
-           std::to_string(instruction.coprocessor.cop_op_register.rt) + ", " +
+    return "cfc1 " +
+           format_register(instruction.coprocessor.cop_op_register.rt) + ", $" +
            std::to_string(instruction.coprocessor.cop_op_register.rd);
   case FULL_OP_CFC2:
-    return "cfc2 $" +
-           std::to_string(instruction.coprocessor.cop_op_register.rt) + ", " +
+    return "cfc2 " +
+           format_register(instruction.coprocessor.cop_op_register.rt) + ", $" +
            std::to_string(instruction.coprocessor.cop_op_register.rd);
 
   case FULL_OP_BC0F:
@@ -622,8 +635,8 @@ std::string disassemble_cache(Instruction const &instruction) {
     throw std::runtime_error("Invalid cache instruction");
   }
   return "cache " + std::to_string(instruction.cache.cache_op) + ", " +
-         format_hex(instruction.cache.offset) + "($" +
-         std::to_string(instruction.cache.base) + ")";
+         format_hex(instruction.cache.offset) + "(" +
+         format_register(instruction.cache.base) + ")";
 }
 
 std::string disassemble(Instruction const &instruction) {
@@ -640,6 +653,8 @@ std::string disassemble(Instruction const &instruction) {
     return disassemble_coprocessor(instruction);
   case TYPE_CACHE:
     return disassemble_cache(instruction);
+  case TYPE_NOOP:
+    return "nop";
   default:
     throw std::runtime_error("Invalid instruction type");
   }

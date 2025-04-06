@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 #include "decoder.h"
 #include "disassembler.h"
@@ -16,18 +17,26 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  uint32_t instruction;
-  if (!bios.read(reinterpret_cast<char *>(&instruction), sizeof(instruction))) {
-    std::cerr << "Failed to read instruction from BIOS" << std::endl;
-    return 1;
+  long long int location = 0;
+  while (bios.good()) {
+    uint32_t instruction;
+    if (!bios.read(reinterpret_cast<char *>(&instruction),
+                   sizeof(instruction))) {
+      break;
+    }
+
+    try {
+      // MIPS uses big endian, so swap bytes if on little endian
+      instruction = __builtin_bswap32(instruction);
+
+      Instruction decoded = mips_decode(instruction);
+      std::cout << "0x" << std::hex << location << "\t" << "0x" << std::setw(8)
+                << std::setfill('0') << instruction << "\t"
+                << disassemble(decoded) << std::endl;
+    } catch (std::runtime_error error) {
+      std::cerr << "Failed to disassemble instruction." << std::endl;
+    }
+    location += 4;
   }
-
-  // MIPS uses big endian, so swap bytes if on little endian
-  instruction = __builtin_bswap32(instruction);
-
-  std::cout << "Instruction: " << std::hex << instruction << std::endl;
-
-  Instruction decoded = mips_decode(instruction);
-  std::cout << disassemble(decoded) << std::endl;
   return 0;
 }

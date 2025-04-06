@@ -126,6 +126,7 @@ static CoprocessorType coprocessor_op_table[2][8] = {
         COP_TYPE_OP_REGISTER, // MF
         COP_TYPE_OP_REGISTER, // DMF
         COP_TYPE_OP_REGISTER, // CF
+        COP_TYPE_INVALID,     // Invalid
         COP_TYPE_OP_REGISTER, // MT
         COP_TYPE_OP_REGISTER, // DMT
         COP_TYPE_OP_REGISTER, // CT
@@ -174,15 +175,15 @@ static FullOp fpu_op_table[8][8] = {
 #define MAP_COP_INSTRUCTION(base_op, suffix)                                   \
   switch (proc_num) {                                                          \
   case 0: {                                                                    \
-    coprocessor_instruction.full_op = FULL_OP_##base_op##0##suffix;            \
+    instruction_data.full_op = FULL_OP_##base_op##0##suffix;                   \
     break;                                                                     \
   }                                                                            \
   case 1: {                                                                    \
-    coprocessor_instruction.full_op = FULL_OP_##base_op##1##suffix;            \
+    instruction_data.full_op = FULL_OP_##base_op##1##suffix;                   \
     break;                                                                     \
   }                                                                            \
   case 2: {                                                                    \
-    coprocessor_instruction.full_op = FULL_OP_##base_op##2##suffix;            \
+    instruction_data.full_op = FULL_OP_##base_op##2##suffix;                   \
     break;                                                                     \
   }                                                                            \
   }
@@ -190,15 +191,15 @@ static FullOp fpu_op_table[8][8] = {
 #define MAP_COP_INSTRUCTION_NO_SUFFIX(base_op)                                 \
   switch (proc_num) {                                                          \
   case 0: {                                                                    \
-    coprocessor_instruction.full_op = FULL_OP_##base_op##0;                    \
+    instruction_data.full_op = FULL_OP_##base_op##0;                           \
     break;                                                                     \
   }                                                                            \
   case 1: {                                                                    \
-    coprocessor_instruction.full_op = FULL_OP_##base_op##1;                    \
+    instruction_data.full_op = FULL_OP_##base_op##1;                           \
     break;                                                                     \
   }                                                                            \
   case 2: {                                                                    \
-    coprocessor_instruction.full_op = FULL_OP_##base_op##2;                    \
+    instruction_data.full_op = FULL_OP_##base_op##2;                           \
     break;                                                                     \
   }                                                                            \
   }
@@ -220,7 +221,7 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
 
       uint8_t fpu_group = (instruction >> 3) & 0x7;
       uint8_t fpu_sub_group = instruction & 0x7;
-      coprocessor_instruction.full_op = fpu_op_table[fpu_group][fpu_sub_group];
+      instruction_data.full_op = fpu_op_table[fpu_group][fpu_sub_group];
     } else {
       coprocessor_instruction.type = COP_TYPE_COFUNC;
       populate_coprocessor_co_func_instruction(
@@ -229,8 +230,7 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
       if (proc_num == 0) {
         uint8_t cop0_group = (instruction >> 3) & 0x7;
         uint8_t cop0_sub_group = instruction & 0x7;
-        coprocessor_instruction.full_op =
-            cop0_op_table[cop0_group][cop0_sub_group];
+        instruction_data.full_op = cop0_op_table[cop0_group][cop0_sub_group];
       } else {
         MAP_COP_INSTRUCTION_NO_SUFFIX(COP)
       }
@@ -274,19 +274,19 @@ Instruction mips_decode_coprocessor_type(uint32_t instruction) {
         break;
       }
       case COP_MT: {
-        coprocessor_instruction.full_op = FULL_OP_MTC0;
+        instruction_data.full_op = FULL_OP_MTC0;
         break;
       }
       case COP_MF: {
-        coprocessor_instruction.full_op = FULL_OP_MFC0;
+        instruction_data.full_op = FULL_OP_MFC0;
         break;
       }
       case COP_DMT: {
-        coprocessor_instruction.full_op = FULL_OP_DMTC0;
+        instruction_data.full_op = FULL_OP_DMTC0;
         break;
       }
       case COP_DMF: {
-        coprocessor_instruction.full_op = FULL_OP_DMFC0;
+        instruction_data.full_op = FULL_OP_DMFC0;
         break;
       }
       default:
@@ -382,6 +382,14 @@ static Instruction (*mips_decode_table[8][8])(uint32_t) = {
     }};
 
 Instruction mips_decode(uint32_t instruction) {
+  // No-op instruction (0x00000000)
+  if (instruction == 0x00000000) {
+    Instruction instruction_data;
+    instruction_data.type = TYPE_NOOP;
+    instruction_data.full_op = FULL_OP_NOOP;
+    return instruction_data;
+  }
+
   // 31..29 - Vertical columns in figure 16-1 (Opcode).
   uint8_t group = (instruction >> 29) & 0x7;
 

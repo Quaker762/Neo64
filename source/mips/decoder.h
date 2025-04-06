@@ -5,6 +5,9 @@ enum FullOp {
   // For invalid instruction detection
   FULL_OP_INVALID,
 
+  // No-op instruction (0x00000000)
+  FULL_OP_NOOP,
+
   // R-type instructions
   FULL_OP_ADD,
   FULL_OP_ADDU,
@@ -220,6 +223,7 @@ enum InstructionType {
   TYPE_COPROCESSOR,
   TYPE_REGISTER_IMMEDIATE,
   TYPE_CACHE,
+  TYPE_NOOP,
 };
 
 // Across all instruction types
@@ -458,6 +462,7 @@ enum CoprocessorType {
   COP_TYPE_OP_REGISTER,
   COP_TYPE_COFUNC,
   COP_TYPE_FPU,
+  COP_TYPE_INVALID,
 };
 
 struct CoprocessorCoFuncInstruction {
@@ -492,7 +497,6 @@ struct CoprocessorFPUInstruction {
 
 struct CoprocessorInstruction {
   CoprocessorType type;
-  FullOp full_op;
   union {
     CoprocessorCoFuncInstruction cop_co_func;
     CoprocessorOpNoRegisterInstruction cop_op_no_register;
