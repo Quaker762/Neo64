@@ -1,3 +1,13 @@
+/**
+ * @file test.cpp
+ *
+ * @brief MIPS Disassembler Test
+ *
+ * @author Zac Brannelly (zac.brannelly@gmail.com)
+ *
+ * SPDX-License-Identifier: GNU General Public License v3.0 only
+ */
+
 #include <fstream>
 #include <iostream>
 #include <stdexcept>

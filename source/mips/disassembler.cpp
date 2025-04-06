@@ -1,3 +1,13 @@
+/**
+ * @file disassembler.cpp
+ *
+ * @brief MIPS Disassembler
+ *
+ * @author Zac Brannelly (zac.brannelly@gmail.com)
+ *
+ * SPDX-License-Identifier: GNU General Public License v3.0 only
+ */
+
 #include "disassembler.h"
 #include <sstream>
 #include <stdexcept>

@@ -1,4 +1,15 @@
+/**
+ * @file disassembler.h
+ *
+ * @brief MIPS Disassembler
+ *
+ * @author Zac Brannelly (zac.brannelly@gmail.com)
+ *
+ * SPDX-License-Identifier: GNU General Public License v3.0 only
+ */
+
 #pragma once
+
 #include "decoder.h"
 #include <string>
 

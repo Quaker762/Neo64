@@ -1,3 +1,13 @@
+/**
+ * @file decoder.cpp
+ *
+ * @brief MIPS Decoder
+ *
+ * @author Zac Brannelly (zac.brannelly@gmail.com)
+ *
+ * SPDX-License-Identifier: GNU General Public License v3.0 only
+ */
+
 #include "decoder.h"
 #include <stdexcept>
 
