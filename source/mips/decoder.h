@@ -446,23 +446,23 @@ enum FPUFormat
 };
 
 // I-type
-struct ImmediateInstruction
+struct alignas(4) ImmediateInstruction
 {
     uint16_t immediate;
     u8 rt;
     u8 rs;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
 // J-type
-struct JumpInstruction
+struct alignas(4) JumpInstruction
 {
     u32 target;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
 // R-type
-struct RegisterInstruction
+struct alignas(4) RegisterInstruction
 {
     FuncCode func;
     u8 sa;
@@ -470,16 +470,16 @@ struct RegisterInstruction
     u8 rt;
     u8 rs;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
 // RegImm-type
-struct RegisterImmediateInstruction
+struct alignas(4) RegisterImmediateInstruction
 {
     uint16_t immediate;
     RegImmOp rt;
     u8 rs;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
 // Coprocessor-type
 enum CoprocessorType
@@ -491,31 +491,31 @@ enum CoprocessorType
     COP_TYPE_INVALID,
 };
 
-struct CoprocessorCoFuncInstruction
+struct alignas(4) CoprocessorCoFuncInstruction
 {
     u32 data;
     bool unused;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
-struct CoprocessorOpNoRegisterInstruction
+struct alignas(4) CoprocessorOpNoRegisterInstruction
 {
     uint16_t immediate;
     CoprocessorSubOp sub_op;
     CoprocessorOp cop_op;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
-struct CoprocessorOpRegisterInstruction
+struct alignas(4) CoprocessorOpRegisterInstruction
 {
     uint16_t unused;
     u8 rd;
     u8 rt;
     CoprocessorOp cop_op;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
-struct CoprocessorFPUInstruction
+struct alignas(4) CoprocessorFPUInstruction
 {
     u8 func;
     u8 fd;
@@ -523,9 +523,9 @@ struct CoprocessorFPUInstruction
     u8 ft;
     FPUFormat fmt;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
-struct CoprocessorInstruction
+struct alignas(4) CoprocessorInstruction
 {
     CoprocessorType type;
     union
@@ -535,16 +535,16 @@ struct CoprocessorInstruction
         CoprocessorOpRegisterInstruction cop_op_register;
         CoprocessorFPUInstruction cop_fpu;
     };
-} __attribute__((aligned(4)));
+};
 
 // Cache operation
-struct CacheInstruction
+struct alignas(4) CacheInstruction
 {
     uint16_t offset;
     CacheOp cache_op;
     u8 base;
     OpCode op;
-} __attribute__((aligned(4)));
+};
 
 // Base instruction type
 struct Instruction
