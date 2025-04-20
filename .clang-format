@@ -1,0 +1,14 @@
+#
+# Neo64 clang-format style file
+#
+
+BasedOnStyle: Microsoft
+IndentWidth: 4
+
+AlignConsecutiveAssignments: Consecutive  # Align only consecutive assignment statements
+DerivePointerAlignment: false             # Don't derive the pointer star location
+PointerAlignment: Left                    # Attach the pointer star to the type
+
+BreakBeforeBraces: Allman                 # Use Allman style bracing (brace on every newline)
+IndentCaseBlocks: false                   # Don't indent case blocks
+IndentCaseLabels: false                   # Don't indent case labels

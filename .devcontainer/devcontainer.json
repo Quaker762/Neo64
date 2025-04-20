@@ -19,6 +19,7 @@
             ],
             "settings": {
                 "editor.trimAutoWhitespace": true,
+                "editor.formatOnSave": true,
                 "files.insertFinalNewline": true,
                 "files.trimFinalNewlines": true,
                 "files.trimTrailingWhitespace": true,
